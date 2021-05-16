@@ -24,8 +24,8 @@ def date_parser(years = 5, days = 2):
         fnl = bgn + datetime.timedelta(days=days)
         #Условие поиска последнего интервала
         if cut == iterations - 1:
-            date.append(str(bgn.strftime("%d.%m.%Y") + "  00:00"))
-            date.append(str(today.strftime("%d.%m.%Y") + "  00:00"))
+            date.append(str(bgn.strftime("%d.%m.%Y") + " 00:00"))
+            date.append(str(today.strftime("%d.%m.%Y") + " 00:00"))
             period.append(date)
             break
         date.append(str(bgn.strftime("%d.%m.%Y") + " 00:00"))
@@ -143,7 +143,7 @@ url = 'https://www.sberbank-ast.ru/UnitedPurchaseList.aspx'
 #Параметры парсера
 keyword = "энергетика"                  #Передать None, чтобы расчёт не включал в себя ключевое слово
 autosave = 10                           #Стандартное значение 10 страниц для автосейва
-dates = date_parser(9,20)               #Массив (n,m) для расчёта на n лет с разбиением по m дней
+dates = date_parser(1,100)              #Массив (n,m) для расчёта на n лет с разбиением по m дней
 result = []                             #Массив итоговых значений по выгрузке
 
 #Открываем сайт и ждём
