@@ -15,6 +15,7 @@ def search(driver, keyword):
     num = int(driver.find_element_by_link_text('В конец').get_attribute("href").split("=")[1])
     if num > 100:
         num = 100
+    print("Total " + str(num) + " pages for " + str(keyword))
     return num
 
 #Функция перехода на следующую страницу
@@ -32,22 +33,24 @@ def parse(driver):
     return parsed_data
 
 #Парсит подготовленный блок страниц
-def open(driver, n, keyword, res_dir="Result"):
+def open(driver, n, keyword, res_dir = "Result"):
     result = []
 
     for i in range(n):
         result.extend(parse(driver))
+        print("Parsing " + str(i+1) + " page")
         if i==n-1:
             break
         next_page(driver)
 
     res = pd.DataFrame(result, columns=['Название статьи'])
     res.to_excel(res_dir + "/Result_" + str(keyword) + ".xlsx")
+    print("End of parsing for " + str(keyword))
     return res
 
 #Параметры парсера
-keyword = "энергетика"                  #Передать None, чтобы расчёт не включал в себя ключевое слово
-res_dir = "Result"
+keyword = "энергетика"                  #Используется в фильтре как ключевое слово, по которому будет происходить парсинг
+res_dir = "Result"                      #Путь до папки для сохранения результатов (по стандарту создаётся папка Result)
 
 if not os.path.exists(res_dir):
     os.mkdir(res_dir)
