@@ -2,27 +2,35 @@ import os
 import time
 import pandas as pd
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import random
+from fake_useragent import UserAgent
 
 #Функция подготовки блока страниц для парсинга, открытие страницы поиска и выставление фильтров, а также расчёт страниц
-def search(driver, keyword):
+def search(keyword):
+    ua = UserAgent()
+    ua.random
+    opts = Options().add_argument("user-agent=" + str(ua))
+    driver = webdriver.Chrome("Driver/chromedriver.exe", chrome_options=opts)
     url = "https://elibrary.ru/querybox.asp?scope=newquery"
+    # Открываем сайт и ждём
     driver.get(url)
     print("Waiting for load...")
+    time.sleep(random.randrange(2, 5))
     driver.find_element_by_tag_name('textarea').send_keys(keyword)
-    time.sleep(1)
     driver.find_element_by_link_text('Поиск').click()
-    time.sleep(15)
+    time.sleep(random.randrange(5,30))
     num = int(driver.find_element_by_link_text('В конец').get_attribute("href").split("=")[1])
     if num > 100:
         num = 100
     print("Total " + str(num) + " pages for " + str(keyword))
-    return num
+    return num, driver
 
 #Функция перехода на следующую страницу
 def next_page(driver):
     script = driver.find_element_by_link_text('>>').get_attribute("href")
     driver.get(script)
-    time.sleep(10)
+    time.sleep(random.randrange(5,30))
 
 #Функция парсинга страницы
 def parse(driver):
@@ -46,22 +54,21 @@ def open(driver, n, keyword, res_dir = "Result"):
     res = pd.DataFrame(result, columns=['Название статьи'])
     res.to_excel(res_dir + "/Result_" + str(keyword) + ".xlsx")
     print("End of parsing for " + str(keyword))
+    driver.close()
     return res
 
 #Параметры парсера
-keyword = "энергетика"                  #Используется в фильтре как ключевое слово, по которому будет происходить парсинг
+keywords = ["энергетика","водород"]                 #Используется в фильтре как ключевое слово, по которому будет происходить парсинг
 res_dir = "Result"                      #Путь до папки для сохранения результатов (по стандарту создаётся папка Result)
 
 if not os.path.exists(res_dir):
     os.mkdir(res_dir)
 
-#Открываем сайт и ждём
-driver = webdriver.Chrome("Driver/chromedriver.exe")
-
 #Работа парсера
-n = search(driver, keyword)
-res = open(driver, n, keyword)
 
-keyword = "водород"
-n = search(driver, keyword)
-res = open(driver, n, keyword)
+for keyword in keywords:
+    search_res = search(keyword)
+    n = search_res[0]
+    driver = search_res[1]
+    res = open(driver, n, keyword)
+
